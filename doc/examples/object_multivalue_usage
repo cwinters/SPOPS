@@ -1,0 +1,14 @@
+my $object = My::Object->new;
+
+# Set field1 to [ 'a', 'b' ]
+$object->{field1} = [ 'a', 'b' ];
+
+# Replace the value of 'a' with 'z'
+$object->{field1} = { replace => { a => 'z' } };
+
+# Add the value 'c'
+$object->{field1} = 'c';
+
+# Find only the ones I want
+my @ones = grep { that_i_want( $_ ) } @{ $object->{field1} };
+

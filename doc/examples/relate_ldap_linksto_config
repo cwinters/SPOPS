@@ -1,0 +1,5 @@
+'publisher' => {
+   class           => 'My::Publisher',
+   isa             => [ 'SPOPS::LDAP' ],
+   links_to        => { 'My::Book' => 'publisherLink' },
+}

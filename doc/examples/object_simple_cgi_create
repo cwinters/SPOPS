@@ -1,0 +1,13 @@
+my $q = new CGI;
+my $obj = MyUserClass->new();
+foreach my $field ( qw( f_name l_name birthdate ) ) {
+    $obj->{ $field } = $q->param( $field );
+}
+my $object_id = eval { $obj->save };
+if ( $@ ) {
+    ... report error information ...
+}
+else {
+    warn " Object saved with ID: $obj->{object_id}\n";
+}
+

@@ -1,0 +1,13 @@
+sub display_user_data {
+    my ( $user ) = @_;
+    return <<INFO;
+  ID:     $user->{user_id}
+  Name:   $user->{first_name} $user->{last_name}
+  Login:  $user->{login_name}
+  Email:  $user->{email}
+INFO
+}
+
+print display_user_data( $my_ldap_user );
+print display_user_data( $my_dbi_user );
+

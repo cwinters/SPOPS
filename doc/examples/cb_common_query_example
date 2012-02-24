@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use strict;
+use SPOPS::Initialize;
+
+{
+    SPOPS::Initialize->process({ filename => 'news_config.perl' });
+    my $user = MyApp->current_login;
+    my $news_iter = My::News->by_user( $user );
+
+    print "Stories posted by $user->{login_name}:\n";
+    while ( my $news = $news_iter->get_next ) {
+        print "$news->{title} posted on $news->{posted_on}\n";
+    }
+}
+
+

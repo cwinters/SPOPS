@@ -1,0 +1,20 @@
+# Create a new user, set some values and save
+
+my $user = $user_class->new;
+$user->{email}      = 'mymail@user.com';
+$user->{first_name} = 'My';
+$user->{last_name}  = 'User';
+my $user_id = eval { $user->save };
+if ( $@ ) {
+    print "There was an error: $SPOPS::Error::system_msg\n"
+}
+
+# Retrieve that same user from the database
+
+my $user_id = $cgi->param( 'user_id' );
+my $user = eval { $user_class->fetch( $user_id ) };
+if ( $@ ) { ... report error ... }
+else {
+    print "The user's first name is: $user->{first_name}\n";
+}
+

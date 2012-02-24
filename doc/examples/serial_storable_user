@@ -1,0 +1,20 @@
+ # Fetch the user object and if retrieved, store it in the session
+
+ my $session = $session_class->create;
+ my $login_name = read_login_name();
+ my $user = eval { $user_class->fetch_by_login_name( $login_name ) };
+ if ( $@ ) { ... }
+ $session->{user_object} = $user->store;
+
+ # ... time passes ...
+
+ my $session = $session_class->fetch( $session_id );
+ my ( $user );
+ if ( $session->{user_object} ) {
+    $user = $user_class->retrieve( $session->{user_object} );
+ }
+ else {
+     my $login_name = read_login_name();
+     my $user = eval { $user_class->fetch_by_login_name( $login_name ) };
+     ...
+ }

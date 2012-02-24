@@ -1,0 +1,18 @@
+package My::UseMyDBIClass; # -*-perl-*-
+
+use strict;
+
+my $USE_CLASS = 'SPOPS::DBI::Pg';
+
+sub behavior_factory {
+  my ( $class ) = @_;
+  return { manipulate_configuration => \&check_spops_subclass };
+}
+
+sub check_spops_subclass {
+    my ( $config ) = @_;
+    foreach ( @{ $config->{isa} } ) {
+        s/^SPOPS::DBI::.*$/$USE_CLASS/;
+    }
+    return ( SPOPS::ClassFactory::RESTART, undef );
+}

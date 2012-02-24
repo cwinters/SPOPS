@@ -1,0 +1,14 @@
+CREATE TABLE address (
+  address_id   %%INCREMENT%%,
+  company      varchar(50) null,
+  address1     %%ADDRESS%% null,
+  address2     %%ADDRESS%% null,
+  city         %%CITY%% null,
+  state        char(2) null,
+  postal       %%POSTAL%% null
+  email        %%EMAIL%% null,
+  main_phone   %%PHONE%% not null,
+  main_fax     %%PHONE%% null,
+  mobile_phone %%PHONE%% null,
+  primary key ( address_id )
+)

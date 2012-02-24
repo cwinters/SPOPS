@@ -1,0 +1,10 @@
+my $q = new CGI;
+my $last_name = $q->param( 'last_name' );
+my $user_list = MyUserClass->fetch_group({ where => 'l_name LIKE ?',
+                                           value => [ "%$last_name%" ],
+                                           order => 'birthdate' });
+print "Users with last name having: $last_name\n";
+foreach my $user ( @{ $user_list } ) {
+    print " $user->{f_name} $user->{l_name} -- $user->{birthdate}\n";
+}
+

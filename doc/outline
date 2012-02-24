@@ -1,0 +1,116 @@
+Process:
+
+ - Put discussion and extended examples in separate doc modules. Module
+ documentation should be restricted to method specifics and one or two
+ examples.
+
+Setup:
+
+Modules
+---------------
+
+SPOPS
+SPOPS::ClassFactory
+SPOPS::ClassFactory::DBI
+SPOPS::ClassFactory::LDAP
+SPOPS::ClassFactory::DefaultBehavior
+SPOPS::Configure
+SPOPS::Configure::DBI
+SPOPS::Configure::Ruleset
+SPOPS::DBI
+SPOPS::DBI::Sybase
+SPOPS::DBI::MySQL
+SPOPS::DBI::Pg
+SPOPS::Error
+SPOPS::GDBM
+SPOPS::HashFile
+SPOPS::Initialize
+SPOPS::Iterator
+SPOPS::Iterator::DBI
+SPOPS::Iterator::LDAP
+SPOPS::Iterator::WrapList
+SPOPS::Key::Random
+SPOPS::Key::DBI::HandleField
+SPOPS::Key::DBI::Identity
+SPOPS::Key::DBI::Pool
+SPOPS::Key::DBI::Sequence
+SPOPS::LDAP
+SPOPS::LDAP::MultiDatasource
+SPOPS::Secure
+SPOPS::Secure::Hierarchy
+SPOPS::SQLInterface
+SPOPS::Tie
+SPOPS::Tie::StrictField
+SPOPS::Utility
+
+
+Docs
+---------------
+
+SPOPS::Manual (embedded in SPOPS? or just referred?)
+
+  - Overview of SPOPS, synopsis, discussion of manual parts
+
+
+SPOPS::Manual::Configuration
+
+  - How the configuration process works
+
+  - What common configuration values are. Pull this information from
+  the implementation modules -- SPOPS::LDAP, SPOPS::DBI, SPOPS::GDBM
+  -- as well as any security-specific information.
+
+
+SPOPS::Manual::CodeGeneration
+
+  - How are the SPOPS classes created?
+
+  - How can you modify the process yourself?
+
+
+SPOPS::Manual::Serialization
+
+  - How are objects saved? How do I know when an object has been
+  saved?
+
+  - ...fetched? (including iterators)
+
+  - ...removed?
+
+  - How are keys generated?
+
+  - How are objects cached? (Move to separate section?)
+
+  - How can I create my own serialization class?
+
+
+SPOPS::Manual::ObjectRules
+
+  - What are general SPOPS behaviors?
+
+  - Discuss rulesets and how they work, give examples.
+
+  - How can I implement a ruleset?
+
+
+SPOPS::Manual::Datasources
+
+  - What is a datasource?
+
+  - How can I make a datasource available to all my objects?
+
+  - How do I use multiple datasources?
+
+
+SPOPS::Manual::Security
+
+  - How does SPOPS security work?
+
+  - How can I find out if security is working properly?
+
+  - How do I secure my objects?
+
+  - How can I use security for other items besides objects?
+
+  - How can I create my own security rules?
+

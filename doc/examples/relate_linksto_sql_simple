@@ -1,0 +1,5 @@
+SELECT book.book_id, book.name
+  FROM publisher pub, book book, publisher_book link
+ WHERE pub.publisher_id = ?
+       AND link.publisher_id = pub.publisher_id
+       AND book.book_id = link.book_id

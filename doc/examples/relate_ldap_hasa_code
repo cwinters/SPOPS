@@ -1,0 +1,13 @@
+my $book = My::Book->fetch( "OpenInteract: The Manual" );
+foreach my $publisher ( @{ $book->publisher } ) {
+    if ( $publisher->{name} eq 'Wrox Press' ) {
+        $book->publisher_remove( $publisher );
+        next;
+    }
+    $found_ora++ if ( $publisher->{name} eq "O'Reilly and Associates" );
+}
+unless ( $found_ora ) {
+    $ora = My::Publisher->fetch( "O'Reilly and Associates" );
+    $book->publisher_add( $ora );
+}
+ 

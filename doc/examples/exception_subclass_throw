@@ -1,0 +1,18 @@
+package My::Object;
+
+use strict;
+use MyApplication::Exception;
+
+my @BADWORDS = qw( pr0n );
+
+sub find_relevant_links {
+    my ( $self ) = @_;
+    my @words_found = grep { $self->{content} =~ /$_/ } @BADWORDS;
+    if ( scalar @words_found ) {
+        my $msg = "Cannot find relevant links -- bad words found: " .
+                  "[" . join( ", ", @words_found ) . "]";
+        MyApplication::Exception->throw(
+               $msg, { business_action => 'determine links from object' } );
+    }
+    ...
+}

@@ -1,0 +1,266 @@
+RELEASE NOTES: SPOPS
+=========================
+
+0.83  Thu Mar 18 21:57:02 EST 2004
+
+ * Fix how sequences are fetched in SPOPS::DBI::Pg and
+   SPOPS::DBI::Oracle
+
+0.82  Mon Mar 15 23:03:29 EST 2004
+
+ * Quick bugfix in SPOPS::DBI
+
+
+0.81  Mon Mar 15 08:13:46 EST 2004
+
+ * Use Log::Log4perl for logging/debugging
+
+ * A number of small bugfixes and enhancements
+
+
+0.80  Sat Nov 29 13:17:17 EST 2003
+
+ * Add auto-generated mutators
+
+ * Customize 'links_to' generation for DBI classes
+
+ * Small bugfixes and enhancements
+
+
+0.79  Sun Sep  7 22:45:07 EDT 2003
+
+ * Number of small fixes
+
+
+0.78  Wed Jun 11 01:05:57 EDT 2003
+
+ * Fix a couple of annoying warnings
+
+
+0.77  Tue Jun 10 10:17:08 EDT 2003
+
+ * Bugfixes and enhancements, nothing big
+
+
+0.76  Sat May 10 15:29:09 EDT 2003
+
+ * A number of small bugfixes and enhancements
+
+
+0.75  Fri Feb 21 08:41:00 EST 2003
+
+ * Fix bug with mixed-case ID field and lazy loading
+
+ * Use 'datetime' datatype in conversion methods
+
+
+0.74  Sun Jan  5 18:38:12 EST 2003
+
+ * Small bugfixes
+
+
+0.73  Thu Jan  2 01:48:26 EST 2003
+
+  * Small bigfixes, lots of POD fixes
+
+
+0.72  Fri Dec 20 08:34:44 EST 2002
+
+  * Change references to new SPOPS SF project, website
+
+  * Fix SPOPS::DBI bug if you're specifying types
+
+
+0.71  Thu Oct 10 08:01:48 EDT 2002
+
+  * Add SPOPS::DBI::TypeInfo
+
+  * Modify Import/Export classes to use Class::Factory 1.00
+
+  * Small bugfixes
+
+
+0.70  Mon Sep 16 16:56:33 EDT 2002
+
+  * Add implementations for security objects
+
+  * Add tests for SPOPS::Secure
+
+  * Small bugfixes
+
+
+0.69  Wed Sep 11 10:59:30 EDT 2002
+
+  * Add new date->date object tool
+
+  * Add tests for SPOPS::Export implementations
+
+  * Other small bugfixes
+
+
+0.68  Wed Aug 28 12:36:31 EDT 2002
+
+  * Fix known problem test so it works on 5.8
+
+
+0.67  Tue Aug 27 21:19:14 EDT 2002
+
+  * Fix module versions so we don't confuse CPAN
+
+
+0.66  Mon Aug 26 08:24:45 EDT 2002
+
+  * Quick bugfix release
+
+
+0.65  Wed Aug 21 17:12:34 EDT 2002
+
+  * Modify build process to run without intervention
+
+  * Add and fix lots of tests and documentation
+
+  * Small fixes and bugfixes to various modules
+
+
+0.64  Sun Aug 11 23:08:05 EDT 2002
+
+  * Small fix to SPOPS::DBI to ignore empty $id on fetch()
+
+
+0.63 Sat Aug 10 09:30:43 EDT 2002
+
+  * Small fix to LDAP test so it only runs when it's supposed to run
+
+
+0.62 Fri Aug  9 23:21:08 EDT 2002
+
+  * Fairly small features added, mostly to SPOPS::DBI
+
+
+0.61 Mon May  6 21:44:57 EDT 2002
+
+  * Quick bugfix release
+
+
+0.60 Mon May  6 08:45:34 EDT 2002
+
+  * InterBase (via DBD::InterBase) support added
+
+  * Add 'insert_alter' for SPOPS::DBI objects
+
+  * Add helpful tools to SPOPS::Tool::*
+
+
+0.59 Mon Mar 18 23:33:06 EST 2002
+
+  * Fix module versions so we don't confuse CPAN
+
+
+0.58 Thu Mar 14 09:03:35 EST 2002
+
+  * Fix id_clause() to work with DBD drivers that don't use the type
+    information when quoting. (Found with latest version of
+    DBD::SQLite.)
+
+
+0.57 Sat Feb 23 14:02:22 EST 2002
+
+  * Oracle (via DBD::Oracle) support added
+
+  * SQLite (via DBD::SQLite) support added
+
+  * Minor bugfixes
+
+
+0.56 Tue Jan 15 07:17:02 EST 2002
+
+  * Change all error handling to use exceptions
+
+  * Sample classes to make writing one-off standalone scripts easier.
+
+  * Minor bugfixes
+
+
+0.55 Mon Dec 31 00:49:15 EST 2001
+
+  * Add Import/Export tools, new key generation method; minor bugfix.
+
+
+0.54 Tue Nov 27 07:42:59 EST 2001
+
+  * Fix bug in clone() method.
+
+
+0.53 Sat Nov 24 20:50:32 EST 2001
+
+  * Added support for multiple field primary keys to SPOPS::DBI
+    classes, and a few more examples. Nothing major.
+
+
+0.52 Thu Oct 25 23:19:43 EDT 2001
+
+  * Bugfixes, enhancements. Nothing major.
+
+
+0.51 Sun Oct 14 20:23:59 EDT 2001
+
+  * Bugfixes, several to SPOPS::LDAP
+
+  * Added first draft of manual ('perldoc SPOPS::Manual')
+
+
+0.50 Tue Aug 28 16:59:39 EDT 2001
+
+  * Added SPOPS::LDAP and accompanying modules.
+
+  * Object code generation totally rewritten, and should be
+    understandable now! If existing code used SPOPS::Configure instead
+    of SPOPS::Initialize, it will have to be changed.
+
+  * See 'Changes for detailed modifications.
+
+
+0.41 Fri Jul 20 07:02:01 EDT 2001
+
+  * Added SPOPS::Iterator and implementation SPOPS::Iterator::DBI to
+    deal with large resultsets in a sane manner.
+
+  * Changes (positive!) to testing framework.
+
+  * See 'Changes' for detailed modifications
+
+
+0.40  Sun Jun 10 14:50:20 EDT 2001
+
+  * Upgraders need to rename two fields in 'sys_security', both of
+    which were changed to get around reserved terms in various
+    databases.
+
+     oid   --> object_id
+     level --> security_level
+
+    In MySQL, you can run:
+
+    ALTER TABLE sys_security CHANGE oid object_id VARCHAR(150)
+
+    ALTER TABLE sys_security CHANGE level security_level CHAR(1)
+
+  * For detailed changes, see the 'Changes' file.
+
+
+0.39
+
+  * If you're using 'AUTO_INCREMENT' fields for SPOPS::DBI::MySQL, you
+    *must* create a new key in your object configuration:
+
+    'increment_field' => 1,
+
+    You don't need to modify anything else.
+
+  * SPOPS.pm (root class for all SPOPS objects) now inherits from
+    Storable, using the methods 'store()', 'retrieve()' and
+    'nstore()'. If you have methods with these names in your object
+    then you won't be able to use the Storable functionality.
+
+=========================
+$Id: RELEASE,v 3.18 2004/03/19 02:50:16 lachoy Exp $

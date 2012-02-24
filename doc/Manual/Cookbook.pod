@@ -1,0 +1,105 @@
+=head1 NAME
+
+SPOPS::Manual::Cookbook - Recipes for SPOPS usage
+
+=head1 DESCRIPTION
+
+This is a collection of recipes for usage of SPOPS. Some are common,
+some might be esoteric, but all of them should help to illuminate how
+SPOPS works and ways that you can expand it for your own needs.
+
+=head1 DATASOURCE AVAILABILITY
+
+SPOPS implementations that rely on some sort of datasource connection
+need to make that connection available all objects and class methods
+that need it. You can also pass a connection around to all calls, but
+this becomes difficult to maintain and is generally only used for
+special cases.
+
+All implementations use the method C<global_datasource_handle()> to
+retrieve the needed connection. So if you make the connection
+available via this method you never have to pass around handles or
+even worry about it.
+
+There are generally two ways (which are basically the same) to do
+this:
+
+=over 4
+
+=item 1.
+
+Make the handle available via a method in the SPOPS object class
+itself.
+
+=item 2.
+
+Make the handle available via a method in the ancestor class.
+
+=back
+
+Both are demonstrated below, using the L<SPOPS::DBI|SPOPS::DBI>
+implementation as an example.
+
+=head2 Datasource via object class
+
+This method works well if you have a small number of objects, or if
+you want to something quickly.
+
+Given the configuration:
+
+[% INCLUDE examples/cb_ds_object_class_config | linenum %]
+
+We can implement the datasource retrieval via a separate class:
+
+[% INCLUDE examples/cb_ds_object_class_code | linenum %]
+
+Or we can also use a self-contained script to do it:
+
+[% INCLUDE examples/cb_ds_object_class_script | linenum %]
+
+=head2 Datasource via ancestor class
+
+If you're using a lot of objects that share the same database or get
+their connection parameters from a common location, creating a common
+ancestor class is usually a better way to go.
+
+First create an ancestor class with the C<global_datasource_handle()>
+method:
+
+[% INCLUDE examples/cb_ds_ancestor_class | linenum %]
+
+And then include the ancestor class in the 'isa' key of your object's
+configuration:
+
+[% INCLUDE examples/cb_ds_ancestor_config | linenum %]
+
+Then just use as normal.
+
+=head1 COMMON QUERIES
+
+A common way to access data is to put a standard library of queries in
+one place and allow only those queries to be executed.
+
+To create a common query, even one that joins multiple tables, just
+write a method and put it in a 'code_class'. For our example, we'll
+use the following configuration:
+
+[% INCLUDE examples/cb_common_query_config | linenum %]
+
+And the following code class:
+
+[% INCLUDE examples/cb_common_query_class | linenum %]
+
+And you would use this like:
+
+[% INCLUDE examples/cb_common_query_example | linenum %]
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

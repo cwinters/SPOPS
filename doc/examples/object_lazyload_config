@@ -1,0 +1,10 @@
+$spops = {
+     html_page => {
+         class        => 'My::HTMLPage',
+         isa          => [ qw/ SPOPS::DBI::Pg SPOPS::DBI / ],
+         field        => [ qw/ page_id location title author content / ],
+         column_group => { listing => [ qw/ location title author / ] },
+         ...
+    },
+};
+

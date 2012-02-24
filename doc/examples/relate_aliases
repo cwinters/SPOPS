@@ -1,0 +1,12 @@
+my %config = (
+  book => {
+    class => 'My::Book', ...
+  },
+  publisher => {
+    class => 'My::Publisher', ...
+  },
+  user => {
+    class => 'My::User', ...
+  },
+);
+SPOPS::Initialize->process({ config => \%config });

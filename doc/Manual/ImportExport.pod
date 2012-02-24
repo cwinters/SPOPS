@@ -1,0 +1,191 @@
+=head1 NAME
+
+SPOPS::Manual::ImportExport - Moving data (and more) with SPOPS
+
+=head1 SYNOPSIS
+
+This part of the SPOPS manual describes how to get data in and out of
+SPOPS datasources, and also how to create portable database
+structures.
+
+=head1 DESCRIPTION
+
+Once you can retrofit object-oriented access and behaviors on top of
+existing datasources, the world is your oyster, right?
+
+Except...
+
+Getting data in and out of these datasources can prove an issue. One
+of the benefits of SPOPS is that databases become more transparent --
+you don't really care what the data are stored on, just that you can
+access it.
+
+Of course, one of the downsides of this transparency is that you might
+actually take advantage of it! Being able to move from MySQL to
+PostgreSQL maybe become much more important, particularly if you're
+consolidating disparate datasources to one or two.
+
+To get around this fact, SPOPS (as of 0.55) comes with importing
+and exporting capabilities. And, of course, it's fairly simple for you
+to extend these capabilities and create your own.
+
+This manual section describes the basics of getting data in and out
+(with examples) and along the way points out ways you can extend it. 
+
+=head1 IMPORTING
+
+There are two types of importing we'll talk about: data and
+structures. Currently the only structural support is for DBI database
+tables, but the framework exists for other datastores.
+
+=head2 Importing Data
+
+No better way to introduce a topic than show working code, so here's a
+simple example of a script to import data:
+
+[% INCLUDE examples/ie_import_data_script | linenum %]
+
+As seen here, there are three main steps to importing:
+
+=over 4
+
+=item 1.
+
+B<Create an importer object>. Instantiating the import object must
+include at least the type of import you will be performing.
+
+In the example, we set the type of import we're doing with the
+parameter 'object' passed into the C<new()> method.
+
+=item 2.
+
+B<Set properties for the importer object>. The importer object needs
+to know some basic information about what you're importing. At a
+minimum, it needs the SPOPS object class and the data you're
+importing. Different types of imports may need additional information
+as well.
+
+In the example, we read the properties for the object from a
+filehandle using the C<data_from_fh()> method.
+
+=item 3.
+
+B<Run the import>. Every import subclass includes the C<run()> method,
+which actually performs the import. Until you execute C<run()>, no
+data are written to the datasource.
+
+=back
+
+No matter what the import format, you will always need to execute
+these three steps. The first two can be combined, either explicitly as
+we did in the example or by passing the properties to the C<new()>
+method.
+
+Currently SPOPS data import options are:
+
+=over 4
+
+=item *
+
+B<object> - Define the SPOPS class and data to fill them; see L<SPOPS::Import::Object>
+
+=item *
+
+B<dbdata> - Import DBI data directly to a table; see L<SPOPS::Import::DBI::Data>
+
+=item *
+
+B<dbupdate> - Update data in a DBI table directly; see L<SPOPS::Import::DBI::Update>
+
+=item *
+
+B<dbdelete> - Delete data from a DBI table; see L<SPOPS::Import::DBI::Delete>
+
+=back
+
+=head2 Importing DBI Tables
+
+Another goal of SPOPS importing and exporting is to make the
+structures the datasources use portable as well. SPOPS has
+support for simplistic generic DBI table importing. It uses keys
+in the CREATE TABLE SQL statement and replaces them with
+database-dependent structures.
+
+One of the most common uses of this is to create a table that supports
+an 'auto-incrementing' field on different databases. Since databases
+use very different schemes for generating this value, it's abstracted
+into a key that's replaced on import.
+
+For instance, take this basic table:
+
+[% INCLUDE examples/ie_import_table_sql | linenum %]
+
+When we run the import the %%INCREMENT%% key gets translated to a
+database-specific expression. In MySQL it would be 'INT NOT NULL
+AUTO_INCREMENT' and in PostgreSQL it would be 'SERIAL'.
+
+You can also add your own translation behaviors. For instance, you can
+create a central datastore for datatypes in your application:
+
+[% INCLUDE examples/ie_import_table_datatypes | linenum %]
+
+And then you'd create a custom behavior and add it to the import
+routine as in this example:
+
+[% INCLUDE examples/ie_import_table_custom | linenum %]
+
+So that a table definition like:
+
+[% INCLUDE examples/ie_import_table_custom_before | linenum %]
+
+would become:
+
+[% INCLUDE examples/ie_import_table_custom_after | linenum %]
+
+It's not as powerful as custom datatypes -- with inheritance and
+dynamic schema updating capabitility -- but it's still very useful to
+enforce data standards within and across applications. (Besides, how
+often do you modify the schema once something is created?)
+
+See L<SPOPS::Import::DBI::Table|SPOPS::Import::DBI::Table> for the
+currently supported keys.
+
+=head1 EXPORTING
+
+Exporting data and importing data are slightly different. With
+importing, you do everything required in the C<run()> method. With
+exporting, the parent class defines the C<run()> method but triggers
+callbacks in the process. Each callback returns content which gets
+concatendated together to form the set of exported objects.
+
+These callbacks are:
+
+B<create_header>
+
+Only called once before any records have been processed.
+
+B<create_record>
+
+Called for each record.
+
+B<create_footer>
+
+Only called once after all the records have been processed.
+
+The export implementation is free to use these how it sees fit. For
+instance, the L<SPOPS::Export::Perl|SPOPS::Export::Perl> just keeps a
+copy of every object it sees and then dumps them all with a single
+call to L<Data::Dumper|Data::Dumper> in the B<create_footer>
+callback. (Due to memory issues, you'd probably want to modify this if
+you were exporting hundreds of thousands of records. But it's just an
+example.)
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

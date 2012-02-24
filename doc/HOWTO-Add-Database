@@ -1,0 +1,64 @@
+HOWTO Add a New DBI Database to SPOPS
+=========================
+
+This document explains how to add support for a new DBI-supported
+database in SPOPS.
+
+
+Introduction
+---------------
+
+There are lots and lots of databases supported by DBI, and we'd like
+as many of them as possible to be supported by SPOPS. Fortunately, DBI
+and the DBD drivers do most of the difficult work for us. In fact, you
+can probably use many databases supported by DBI with no effort at all.
+
+This document is for when you can't, or for when you need
+functionality not provided in the stock SPOPS::DBI module.
+
+
+The Files
+---------------
+
+Here are the files you should be concerned with:
+
+ SPOPS/DBI.pm
+
+   - Object serialization functionality
+
+ SPOPS/SQLInterface.pm
+
+   - Database interaction
+
+ SPOPS/Key/DBI/*.pm
+
+   - Generate primary keys
+
+
+The Issues
+---------------
+
+When porting from one database to another, there are a few general
+issues to worry about:
+
+ (1) Naming conventions: does a naming convention in one database
+ violate the convention in another?
+
+ (2) Datatypes:
+
+ (3) Auto-generating primary keys:
+
+ (4) Differing functionality:
+
+If your database does not have a method for generating primary keys,
+then you probably don't need to do anything at all. The main areas
+where we need DBD-specific code are in SPOPS::SQLInterface, and as
+long as your database supports the {Name} attribute of the database
+handle and the {TYPE} and {NAME} attributes of a statement handle, you
+shouldn't need to do anything.
+
+
+
+
+=========================
+$Id: HOWTO-Add-Database,v 3.0 2002/08/28 01:16:31 lachoy Exp $

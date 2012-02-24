@@ -1,0 +1,14 @@
+my ( $object, $links );
+eval { 
+    $object = My::Object->fetch( $id );
+    $links = $object->find_relevant_links;
+};
+if ( $@ and $@->isa( 'MyApplication::Exception' ) ) {
+    print "Error trying to ", $@->business_action(), ": $@";
+}
+elsif ( $@ ) {
+    print "Database error: $@";
+}
+else {
+    print join( ", ",  @{ $links } );
+}

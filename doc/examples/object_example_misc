@@ -1,0 +1,55 @@
+# Create a new object with initial values, set another value and save
+
+my $data = MyClass->new({ field1 => 'value1',
+                          field2 => 'value2' });
+print "The value for field2 is: $data->{field2}\n";
+$data->{field3} = 'value3';
+eval { $data->save };
+if ( $@ ) { ... report error ... }
+
+# Remove the object permanently
+
+eval { $data->remove };
+if ( $@ ) { ... report error ... }
+
+# Call arbitrary object methods to get other objects
+
+my $other_obj = eval { $data->call_to_get_other_object() };
+if ( $@ ) { ... report error ... }
+
+# Clone the object with an overridden value and save
+
+my $new_data = $data->clone({ field1 => 'new value' });
+eval { $new_data->save };
+if ( $@ ) { ... report error ... }
+
+# $new_data is now its own hashref of data --
+# explore the fields/values in it
+
+while ( my ( $k, $v ) = each %{ $new_data } ) {
+    print "$k == $v\n";
+}
+
+# Retrieve saved data
+
+my $saved_data = eval { MyClass->fetch( $id ) };
+if ( $@ ) { ... report error ... }
+else {
+  while ( my ( $k, $v ) = each %{ $saved_data } ) {
+      print "Value for $k with ID $id is $v\n";
+  }
+}
+
+# Retrieve lots of objects, display a value and call a
+# method on each
+
+my $data_list = eval { MyClass->fetch_group({ 
+                                    where => "last_name like 'winter%'" }) };
+if ( $@ ) { ... report error ... }
+else {
+    foreach my $obj ( @{ $data_list } ) {
+        print "Username: $obj->{username}\n";
+        $obj->increment_login();
+    }
+}
+

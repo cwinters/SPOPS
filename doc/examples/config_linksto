@@ -1,0 +1,10 @@
+# Given:
+'contained' => {
+   class => 'My::ContainedClass',
+   id    => 'contained_id',
+}
+
+# Basic usage
+   links_to => { class-name => 'linking-table-name' }
+   links_to => { My::ContainedClass => 'contained_link' }
+   -- Creates method 'contained', 'contained_add' and 'contained_remove'

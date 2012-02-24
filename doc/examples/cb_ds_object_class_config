@@ -1,0 +1,15 @@
+my $spops = {
+  'news' => {
+     class           => 'My::News',
+     isa             => [ 'SPOPS::DBI::Pg', 'SPOPS::DBI' ],
+     rules_from      => [ 'My::DiscoverField' ],
+     code_class      => [ 'My::NewsHandle' ],
+     field_discover  => 'yes',
+     base_table      => 'news',
+     id_field        => 'news_id',
+     increment_field => 1,
+     no_insert       => [ 'news_id' ],
+     no_update       => [ 'news_id' ],
+  },
+};
+

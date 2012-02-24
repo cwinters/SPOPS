@@ -1,0 +1,36 @@
+# Given:
+'contained' => {
+   class => 'My::ContainedClass',
+   id    => 'contained_id',
+}
+
+# Basic usage
+   has_a => { class-name => 'id-field' },
+   has_a => { My::ContainedClass => 'contained_id' }
+   -- Creates method 'contained'
+
+# Other ID field name
+   has_a => { class-name => 'id-field' },
+   has_a => { My::ContainedClass => 'original' }
+   -- Creates method 'original_contained'
+
+# Multiple ID fields
+   has_a => { class-name => [ 'id-field', 'id-field' ] },
+   has_a => { My::ContainedClass => [ 'contained_id, 'original' ] }
+   -- Creates methods 'contained' and 'original_contained'
+
+# Specific method to create and a default 
+   has_a => { class-name => { method-name => 'id-field' }, 'id-field' },
+   has_a => { My::ContainedClass =>
+                    { 'originally_contained_by' => 'original' },
+                    'contained_id' },
+   -- Creates methods 'originally_contained_by' and 'contained'
+
+# Specific method to create and multiple other ID fields
+   has_a => { class-name => { method-name => 'id_field'},
+                            [ 'id-field', 'id-field' ]    },
+   has_a => { My::ContainedClass =>
+                    { 'originally_contained_by' => 'original' },
+                    [ 'contained_id', 'future' ] }
+   -- Creates methods 'originally_contained_by', 'contained' and
+      'future_contained'

@@ -1,0 +1,4 @@
+SPOPS::Initialize->process({ config => \%config });
+my $book_alias = My::Book->CONFIG->{main_alias};
+my $pub_alias  = My::Publisher->CONFIG->{main_alias};
+my $user_alias = My::User->CONFIG->{main_alias};

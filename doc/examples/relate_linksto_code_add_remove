@@ -1,0 +1,17 @@
+my $publisher = My::Publisher->fetch( $pub_id );
+my $books = $publisher->book;
+foreach my $book ( @{ $books } ) {
+    if ( $book->publication_date < 1990 ) {
+        $publisher->book_remove( $book );
+    }
+}
+
+my @book_ids = ();
+open( REPORT, '< new_publications_report' );
+while ( <REPORT> ) {
+    chomp;
+    s/\s//g;
+    next if ( $_ eq '' );
+    push @book_ids, $_;
+}
+$publisher->book_add( \@book_ids );

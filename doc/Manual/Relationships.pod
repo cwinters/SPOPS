@@ -1,0 +1,362 @@
+=head1 NAME
+
+SPOPS::Manual::Relationships - SPOPS object relationships
+
+=head1 SYNOPSIS
+
+This document aims to answer the following questions:
+
+=over 4
+
+=item *
+
+How do I relate objects?
+
+=back
+
+=head1 DESCRIPTION
+
+Objects are great by themselves, but some real power comes when you
+can declaratively relate objects to one another. SPOPS allows you to
+do this through the class configuration.
+
+The two types of relationships are called 'has_a' and 'links_to'.
+
+The 'has_a' relationship is when an object contains another object, a
+one-to-one (or many-to-one) relationship -- a C<Monitor> object has a
+single C<Manufacturer> object, a C<Monitor> object has a single
+C<CathodeRayTube> object. This relationship may be a 'dependent'
+relationship or not, SPOPS doesn't make a distinction. (A dependent
+relationship is one where the related object doesn't exist outside the
+context of the original one -- you probably wouldn't deal with a CRT
+without a monitor, but you would definitely deal with a manufacturer
+outside of a monitor.)
+
+The 'links_to' relationship is when an object is related to one or
+many other objects -- A C<Manufacturer> object is related to multiple
+C<Monitor> objects. Using a L<DBI|DBI> datastore this is typically
+implemented with a linking table, but if you're dealing with dependent
+objects a linking table may be unnecessary.
+
+Two objects can mix the two relationships: while a C<Monitor> may have
+a single C<Manufacturer>, a C<Manufacturer> will have many
+C<Monitors>.
+
+=head2 Code Generation
+
+Relationship methods are created when the SPOPS class is
+initialized. (See
+L<SPOPS::Manual::CodeGeneration|SPOPS::Manual::CodeGeneration> for
+more information on this process.) The names of the methods generated
+depend on the type of the relationship and how it's configured, but
+they frequently depend on what's called the B<object alias>. This is
+simply the key given in the configuration passed to
+L<SPOPS::Initialize|SPOPS::Initialize> or
+L<SPOPS::ClassFactory|SPOPS::ClassFactory>. For instance, in the
+following configuration we define three classes with the aliases
+'user', 'book' and 'publisher':
+
+[% INCLUDE examples/relate_aliases | linenum %]
+
+You can always get the alias for a class by querying its
+configuration:
+
+[% INCLUDE examples/relate_query_alias | linenum %]
+
+=head1 MULTIPLE ID FIELDS
+
+None of the automatically generated methods works with multi-field
+primary keys. To create a relationship you will need to write the
+method by hand.
+
+=head1 SPOPS GENERIC - USING 'has_a'
+
+=head2 Configuration
+
+Here are the potential 'has_a' configuration options:
+
+[% INCLUDE examples/config_hasa | linenum %]
+
+=head2 The Basics
+
+All SPOPS objects can define a 'has_a' relationship. This is a
+one-to-one relationship between two objects. To use a canonical
+example, a book B<has a> single publisher. (The reverse relationship,
+a publisher B<links to> many books, will be discussed below.)
+
+Generally this is defined through an object containing the ID for
+another object as one of its values. Therefore, to specify the
+relationship you need:
+
+=over 4
+
+=item * the type of object contained (class)
+
+=item * the ID field(s) defining the object contained
+
+=back
+
+To use the book and publisher example:
+
+[% INCLUDE examples/relate_book_hasa_config | linenum %]
+
+[% INCLUDE examples/relate_publisher_hasa_config | linenum %]
+
+So here we map the class we want our book object to contain
+(C<My::Publisher>) to the field in the book object which contains the
+ID of the object.
+
+Once we process this, we can call:
+
+[% INCLUDE examples/relate_book_hasa_code_simple | linenum %]
+
+And retrieve the C<My::Publisher> object contained in the C<$book>
+object.
+
+This method C<publisher()> is created at class initialization. (See
+L<SPOPS::Manual::CodeGeneration|SPOPS::Manual::CodeGeneration> for
+more information on this process.) SPOPS knows to call the method
+C<publisher> from the alias attached to the class C<My::Publisher> and
+because the name of the ID field in the C<My::Book> object is the same
+as the ID field in the C<My::Publisher> object.
+
+=head2 More Complex Example: Different ID Field
+
+Many times you will have a field that contains the ID of a contained
+object, but it's not the same name as the ID field of the contained
+object. For example, in your C<My::Book> object you may have a field
+to contain the ID of the user who last updated the record. This field
+might be named 'updated_by' while the ID field for the C<My::User>
+object is 'user_id'.
+
+To automatically create the relationship, you would add to your
+configuration so it looks like this:
+
+[% INCLUDE examples/relate_book_hasa_config_different_id | linenum %]
+
+SPOPS would create a method 'updated_by_user' that would return the
+C<My::User> object with the ID equal to the 'updated_by' field of the
+C<My::Book> object. How did it create this method name?
+
+Without further customization (more below), SPOPS will take the field
+name originating the relationship ('updated_by'), append a '_' and
+then append the alias of the object being related to ('user').
+
+ updated_by + _ + user => updated_by_user
+
+This can be useful but somewhat clunky if you have long fieldnames
+and/or object aliases. So you can customize this by specifying the
+name of the method you'd like to create Say we wanted to call up the
+user who updated the C<My::Book> object with the method 'updater'. To
+do this we'd change the configuration:
+
+[% INCLUDE examples/relate_book_hasa_config_different_id_and_name | linenum %]
+
+=head2 More Complex Example: More Than One Contained Object
+
+Many times you may have more than one of a particular type of object
+contained in another object. For example, say our publishing company
+bought the rights to a number of books that we want to republish under
+our own name. We want to keep the original publisher and the current
+publisher in separate fields. (We could also do this by creating a
+table to link the book and publisher tables, but that can get
+complicated quickly, and in this case it's unnecessary.)
+
+So after changing our schema we now have two publisher fields in our
+C<My::Book> object: 'original_publisher_id' and
+'current_publisher_id'. Here's what a first pass at the configuration
+would look like:
+
+[% INCLUDE examples/relate_book_hasa_config_multiple_simple | linenum %]
+
+This works, but the automatically created methods will be
+C<original_publisher_id_publisher()> and
+C<current_publisher_id_publisher()>. Nasty. Let's fix that so we use
+the methods C<original_publisher()> and C<current_publisher()>.
+
+[% INCLUDE examples/relate_book_hasa_config_multiple_complex | linenum %]
+
+It looks a little hairy, but you can see how we've built it up step by
+step. Fortunately, once you get the mapping down you never need to
+edit it again until a schema change, which is hopefully quite rare.
+
+=head1 SPOPS::DBI - USING 'links_to'
+
+=head2 Configuration
+
+Here are the potential 'links_to' configuration options:
+
+[% INCLUDE examples/config_linksto | linenum %]
+
+=head2 The Basics
+
+A 'links_to' relationship is one-to-many. (It can also be many-to-many
+if we look at it in both directions.)  To continue with our example
+above, a single publisher B<links to> many books.
+
+Generally this is defined by a linking table. For instance, assume you
+have the following scaled down schema:
+
+[% INCLUDE examples/relate_linksto_schema | linenum %]
+
+The 'publisher_book' table acts to link the 'publisher' and 'book'
+tables. (In the real world, you'd probably make the relationship its
+own object since it would contain additional information about the
+relationship.)
+
+Using SQL, you'd fetch the books for a particular publisher with a
+statement like this:
+
+[% INCLUDE examples/relate_linksto_sql_simple | linenum %]
+
+Since we're dealing with objects, we want to be able to perform
+something like this:
+
+[% INCLUDE examples/relate_linksto_code_simple | linenum %]
+
+The configuration to make this happen would look like this:
+
+[% INCLUDE examples/relate_linksto_book_config | linenum %]
+
+[% INCLUDE examples/relate_linksto_publisher_config | linenum %]
+
+=head2 Adding and Removing Links
+
+When you define a 'links_to' relationship, SPOPS generates three
+methods:
+
+=over 4
+
+=item *
+
+C<$alias> - Returns an arrayref of related objects
+
+=item *
+
+C<${alias}_add( $id | $object | \@id_list | \@object_list )> - Adds
+links to the related objects in C<$object> or C<\@object_list> or
+defined by the IDs in C<$id> or C<\@id_list>.
+
+=item *
+
+C<{$alias}_remove( $id | $object | \@id_list | \@object_list )> -
+Removes links to the related objects in C<$object> or C<\@object_list>
+or defined by the IDs in C<$id> or C<\@id_list>.
+
+=back
+
+The first one is covered above. The C<_add()> and C<_remove()> methods
+remove the link between two objects rather than the object itself. To
+use your example, removing a link between the book and publisher would
+delete the record out of the 'publisher_book' table but leave the
+associated 'publisher' and 'book' records unchanged.
+
+Code adding and removing a book from the publisher might look like:
+
+[% INCLUDE examples/relate_linksto_code_add_remove | linenum %]
+
+=head2 Advanced 'links_to' configuration
+
+You can also specify many of the variables used in the code generation
+process yourself. For instance, your linking table may not use the
+same ID fields as either of your classes, or you may want to modify
+the names of the methods created.
+
+To do this pass a hashref instead of a table name in the 'links_to'
+configuration. For instance, if in our 'publisher_book' table the
+publisher ID was 'p_id' and the book ID was 'b_id' we would use:
+
+[% INCLUDE examples/relate_linksto_complex_publisher_config | linenum %]
+
+The fields we can define are:
+
+=over 4
+
+=item B<table> (required)
+
+You must still specify the table you're using as a linking table.
+
+=item B<to_id_field> (optional)
+
+If the ID field of the object you're linking to is different than
+configured in the class you can specify it here. So in the above
+example the object linking to is 'book' and the new ID field for the
+book was 'b_id'.
+
+=item B<from_id_field> (optional)
+
+If the ID field of the object you're linking from is different than
+configured in the class you can specify it here. So in the above
+example the object linking from is 'publisher' and the new ID field
+for the book was 'p_id'.
+
+=item B<alias> (optional)
+
+You can change the names of the generated methods using this
+value. Instead of using the main alias of the class as configured you
+can specify something new here. So if you wanted the methods to be
+generated for your Spanish-speaking developers you can set this to
+'libro' and the methods generated would be 'libro', 'libro_add' and
+'libro_remove' instead of 'book', 'book_add' and 'book_remove'.
+
+=back
+
+=head1 SPOPS::LDAP - USING 'has_a' 
+
+The basic idea is the same as the default implementation for 'has_a'
+-- -- the ID for the object is contained within the object being
+queried. (That is, I contain these DN's to which I'm related.)
+However, since L<SPOPS::LDAP|SPOPS::LDAP> objects can have multivalued
+fields it can store multiple IDs (in this case, distinguished names)
+and therefore relate to multiple objects. Therefore, we also define
+C<_add()> and C<_remove()> methods for each relationship.
+
+The relationship declaration is very similar:
+
+[% INCLUDE examples/relate_ldap_hasa_config | linenum %]
+
+Here, we specify that we're holding DN records for C<My::Publisher>
+objects in the field C<publisherLink>.
+
+We'd fetch, add and remove related LDAP objects similar to the DBI
+actions. Also similar to the DBI actions, we're not actually deleting
+the related object, just the link to the related object:
+
+[% INCLUDE examples/relate_ldap_hasa_code | linenum %]
+
+=head1 SPOPS::LDAP - USING 'links_to'
+
+This is the reverse of the 'has_a' idea -- the ID for this object is
+contained within a field of other objects. (That is, my DN is in other
+objects to which I'm related.) But similar to 'has_a' the methods
+C<_add()> and C<_remove()> are created in the code generation
+process. However, instead of modifying this object the C<_add()> and
+C<_remove()> methods remove the DN for this object from the other
+object's field.
+
+Here's a configuration snippet:
+
+[% INCLUDE examples/relate_ldap_linksto_config | linenum %]
+
+And a brief usage example:
+
+[% INCLUDE examples/relate_ldap_linksto_code | linenum %]
+
+=head1 FUTURE DIRECTIONS
+
+Ray Zimmerman has written up a much improved method for defining
+relationships between objects. This will be implemented before SPOPS
+1.0, but time constraints make it impossible to specify when this will
+happen:
+
+ http://www.geocrawler.com/archives/3/8393/2002/1/0/7464826/
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

@@ -1,0 +1,18 @@
+
+foreach my $page ( @{ $page_list } ) {
+
+    # These properties are in the fetched object and are not
+    # lazy-loaded
+
+    print "Title: $page->{title}\n",
+          "Author: $page->{author}\n";
+
+    # When we access lazy-loaded properties like 'content', SPOPS goes
+    # and retrieves the value for each object property as it's
+    # requested.
+
+    if ( $title =~ /^OpenInteract/ ) {
+        print "Content\n\n$page->{content}\n";
+    }
+}
+

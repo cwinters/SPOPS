@@ -1,0 +1,9 @@
+my $config = {
+    myobject => {
+          class       => 'My::SPOPS',
+          field       => [ qw/ my_id my_name my_date / ],
+          field_alter => { my_date => "DATE_FORMAT( my_date, '%Y/%m/%d %I:%i %p' )" },
+          ...,
+    },
+};
+

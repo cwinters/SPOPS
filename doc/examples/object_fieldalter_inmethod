@@ -1,0 +1,3 @@
+my $alter = { my_date => "DATE_FORMAT( my_date, '%Y/%m/%d %I:%i %p' )" };
+my $object = My::SPOPS->fetch( $object_id, { field_alter => $alter } );
+

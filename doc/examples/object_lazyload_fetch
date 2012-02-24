@@ -1,0 +1,2 @@
+my $page_list = My::HTMLPage->fetch_group({ order        => 'location',
+                                            column_group => 'listing' });

@@ -1,0 +1,2 @@
+my $book = My::Book->fetch( $book_id );
+my $publisher = $book->publisher();

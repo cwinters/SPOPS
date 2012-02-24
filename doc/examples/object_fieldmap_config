@@ -1,0 +1,7 @@
+field_map    => { 'last_name'  => 'sn',
+                  'first_name' => 'givenname',
+                  'password'   => 'userpassword',
+                  'login_name' => 'uid',
+                  'email'      => 'mail',
+                  'user_id'    => 'cn'  }
+

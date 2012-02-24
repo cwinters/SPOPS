@@ -1,0 +1,359 @@
+=head1 NAME
+
+SPOPS::Manual::Object - Shows how you interact with SPOPS objects.
+
+=head1 DESCRIPTION
+
+This section of the SPOPS manual should be of interest to users and
+developers, since it describes how SPOPS objects are used. Note that
+all examples here assume the SPOPS class has already been created --
+for more on this see
+L<SPOPS::Manual::Configuration|SPOPS::Manual::Configuration> and
+L<SPOPS::Manual::CodeGeneration|SPOPS::Manual::CodeGeneration> for
+more information about that process.
+
+=head2 A Simple Example
+
+How better to start off than a simple example. Here we get values from
+CGI.pm, set the values into a new SPOPS object and save it:
+
+[% INCLUDE examples/object_simple_cgi_create | linenum %]
+
+You can then display this object's information from a later request:
+
+[% INCLUDE examples/object_simple_cgi_display | linenum %]
+
+To display other information from the same object, like related
+objects:
+
+[% INCLUDE examples/object_simple_cgi_related | linenum %]
+
+And you can fetch batches of objects at once based on arbitrary
+criteria:
+
+[% INCLUDE examples/object_simple_cgi_fetchgroup | linenum %]
+
+=head2 Tie Interface
+
+This version of SPOPS uses a L<tie|tie> interface to get and set the
+individual data values. You can also use the more traditional OO
+C<get> and C<set> operators, but most people will likely find the
+hashref interface easier to deal with. It also means you can
+interpolate data into strings: bonus!
+
+The tie interface allows the most common operations -- fetch data and
+put it into a data structure for later use -- to be done very
+easily. It also hides much of the complexity behind the object for you
+so that most of the time you are dealing with a simple hashref.
+
+However, the tie interface also allows us to give behaviors to the
+SPOPS object that are executed transparently with every get or set of
+a value. For instance, if you use strict field checking (example
+below), we can catch any property name misspellings or wrong names
+being used for properties. We can also track property state as
+necessary so we can know whether an object has changed or not since it
+was created or fetched. Property values can also be lazy-loaded.
+
+=head2 Automatically Created Accessors and Mutators
+
+In addition to getting the data for an object through the hashref
+method, you can also get to the data with accessors named after the
+fields.
+
+For example, given the fields:
+
+ $user->{f_name}
+ $user->{l_name}
+ $user->{birthday}
+
+You can call the following to retrieve the data:
+
+ $user->f_name();
+ $user->l_name();
+ $user->birthday();
+
+And to the following to modify the data:
+
+ $user->f_name( 'Ferris' );
+ $user->l_name( 'Bueller' );
+ $user->birthday( '1970-02-14' );
+
+Since the accessor and mutator share a method the mutator needs to
+know whether to do its job. It does this by testing the first
+parameter passed in for definedness. Most of the time this is fine,
+but what happens when you want to clear out a value like this?
+
+ $user->m_name( undef );
+
+This won't do what you think -- since the first parameter is undefined
+it will simply act as an accessor.
+
+To clear a value, call instead the '_clear' method associated with a
+fieldname:
+
+ $user->m_name_clear;
+
+This explicitly sets the value to undef.
+
+SPOPS accomplishes this using AUTOLOAD, and after the first call it
+automatically creates a subroutine in the namespace of your class to
+catch successive calls. If you require you can modify how these two
+methods get created by overriding
+C<_internal_create_field_methods()>. This takes three arguments: the
+object being modified, the class to install the routines into, and the
+fieldname used to create the methods. Don't implement this unless you
+know what you're doing -- check out the implementation in
+L<SPOPS|SPOPS> before proceeding down this path, since doing it wrong
+could create some nasty side-effects.
+
+=head2 Tracking State Changes
+
+The object tracks whether any changes have been made since it was
+instantiated and keeps an internal toggle switch. You can query the
+toggle or set it manually.
+
+ $obj->changed();
+
+Returns 1 if there has been change, undef if not.
+
+ $obj->has_change();
+
+Sets the toggle to true.
+
+ $obj->clear_change();
+
+Sets the toggle to false.
+
+Example:
+
+ if ( $obj->changed() ) {
+     my $rv = $obj->save();
+ }
+
+Note that this can (and should) be implemented within the subclass, so
+you as a user can simply call:
+
+ $obj->save();
+
+And not worry about whether it has been changed or not. If there has
+been any modification, the system will save it, otherwise it will not.
+
+=head2 Multiple-Field ID Fields
+
+As of SPOPS 0.53, L<SPOPS::DBI|SPOPS::DBI> supports multi-field
+primary keys. To use it, you just use an arrayref to represent the ID
+field in the C<id()> method rather than a string. (Wisenheimers who
+use an arrayref with one element may be shocked that SPOPS finds this
+attempt to trick it and sets the value to the single element.)
+
+When using C<fetch()>, you need to represent the ID as a
+comma-separated string similar to that returned by C<id()> in scalar
+context (see below). For example:
+
+ # Configuration
+ myclass => {
+     class => 'My::Customer',
+     id    => [ 'entno', 'custno' ],
+     ...
+ },
+
+ # Fetch object
+ my $cust = My::Customer->fetch( "$entno,$custno" );
+
+On finding multiple ID fields,
+L<SPOPS::ClassFactory::DBI|SPOPS::ClassFactory::DBI> creates new
+methods for C<id()>, C<id_field> and C<id_clause>. Both C<id()> and
+C<id_field()> are context-sensitive, and C<id_clause()> returns a
+clause with multiple atoms.
+
+One at a time:
+
+B<id( [ $id_value ] )>
+
+In list context, returns the values for the ID fields in order. In
+scalar context, returns the ID values joined by a comma. (This may be
+configurable in the future.)
+
+ my ( $id_val1, $id_val2 ) = $object->id();
+ my $id_string = $object->id();
+ $object->id( [ 'value1', 'value2' ] );
+
+B<id_field()>
+
+In list context, returns an n-element list with the ID fieldnames. In
+scalar context, returns the fieldnames joined by a comma. (This may be
+configurable in the future.)
+
+ my ( $field1, $field2 ) = $object->id_field();
+ my $field_string = $object->id_field();
+
+B<id_clause()>
+
+Returns a full WHERE clause to find this particular record -- used in
+UPDATE and DELETE statements. If you're using as a class method, you
+need to pass in the ID values as an arrayref or as a comma-separated
+string as returned by C<id()> in scalar context.
+
+ my $where = $obj->id_clause();
+ my $sql = "SELECT * FROM foo WHERE $where";
+
+ my $where = $obj_class->id_clause( [ $id_val1, $id_val2 ] );
+ my $sql = "SELECT * FROM foo WHERE $where";
+
+ my $where = $obj_class->id_clause( "$id_val1,$id_val2" );
+ my $sql = "SELECT * FROM foo WHERE $where";
+
+=head2 Lazy Loading
+
+As of version 0.40, SPOPS supports lazy loading of objects. This means
+you do not have to load the entire object at once.
+
+To use lazy loading, you need to specify one or more 'column groups',
+each of which is a logical grouping of properties to fetch. Further,
+you need to specify which group of properties to fetch when you run a
+'fetch' or 'fetch_group' command. SPOPS will fetch only those fields
+and, as long as your implementing class has a subroutine for
+performing lazy loads, will load the other fields only on demand.
+
+For example, say we have an object representing an HTML page. One of
+the most frequent uses of the object is to participate in a listing --
+search results, navigation, etc. When we fetch the object for listing,
+we do not want to retrieve the entire page -- it is hard on the
+database and takes up quite a bit of memory.
+
+So when we define our object, we define a column group called
+'listing' which contains the fields we display when listing the
+objects:
+
+[% INCLUDE examples/object_lazyload_config | linenum %]
+
+And when we retrieve the objects for listing, we pass the column group
+name we want to use:
+
+[% INCLUDE examples/object_lazyload_fetch | linenum %]
+
+Now each object in C<\@page_list> has the fields 'page_id',
+'location', 'title' and 'author' filled in, but not 'content', even
+though 'content' is defined as a field in the object. The first time
+we try to retrieve the 'content' field, SPOPS will load the value for
+that field into the object behind the scenes.
+
+[% INCLUDE examples/object_lazyload_usage | linenum %]
+
+Obviously, you want to make sure you use this wisely, otherwise you
+will put more strain on your database than if you were not using lazy
+loading. The example above, for instance, is a good use since we might
+be using the 'content' property for a few objects. But it would be a
+poor use if we did not have the C<if> statement or if B<every> 'title'
+began with 'OpenInteract' since the 'content' property would be
+retrieved anyway.
+
+See L<SPOPS::Manual::Serialization|SPOPS::Manual::Serialization> for
+how to implement lazy loading for your objects.
+
+=head2 Field Mapping
+
+As of version 0.50, SPOPS has the ability to make an object look like
+another object, or to put a prettier face on existing data.
+
+In your configuration, just specify:
+
+ field_map => { new_name => 'existing_name', ... }
+
+For example, you might need to make your user objects stored in an
+LDAP directory look like user objects stored in a DBI database. You
+could say:
+
+[% INCLUDE examples/object_fieldmap_config | linenum %]
+
+So, despite having entirely different schemas, the following would
+print out equivalent information:
+
+[% INCLUDE examples/object_fieldmap_usage | linenum %]
+
+Another use might be to represent properties in a different language.
+
+Note that you can have more than one new field pointing to the same
+old field.
+
+=head2 Field Value Altering
+
+In some implementations (notably L<SPOPS::DBI|SPOPS::DBI>), you can
+alter the value of a field before it gets set in the object. This can
+be a useful (if sometimes non-portable) way of doing transparent data
+formatting for all objects. And this method is usually faster than
+just using Perl, which is an added bonus.
+
+For instance, maybe you're using MySQL and you want to take advantage
+of its date-formatting capabilities. You can tell SPOPS to use them in
+one of two ways.
+
+First, you can specify the information in your object configuration:
+
+[% INCLUDE examples/object_fieldalter_config | linenum %]
+
+Second, you can pass the information in on a per-object basis:
+
+[% INCLUDE examples/object_fieldalter_inmethod | linenum %]
+
+Both will have exactly the same effect.
+
+So, how would you do this in Perl and SPOPS?  You would likely create
+a post_fetch rule that did whatever data manipulation you wanted:
+
+[% INCLUDE examples/object_fieldalter_asrule | linenum %]
+
+See L<SPOPS::Manual::ObjectRules|SPOPS::Manual::ObjectRules> for more
+info on creating rulesets and what you can do with them.
+
+=head2 Multivalued Fields
+
+Some data storage backends -- like LDAP -- can store multiple values
+for a single field. As of version 0.50, SPOPS can do the same.
+
+All you need to do is specify in your configuration which fields
+should be multivalued:
+
+[% INCLUDE examples/object_multivalue_config | linenum %]
+
+Thereafter you can access them as below (more examples in
+L<SPOPS::Tie|SPOPS::Tie>):
+
+[% INCLUDE examples/object_multivalue_usage | linenum %]
+
+Note that the value returned from a field access to a multivalue field
+is always an array reference. If there are no values, the reference is
+empty.
+
+=head2 Strict Fields
+
+If you ask, SPOPS will ensure that all get and set accesses are
+checked against the fields the object should have. You ask by setting
+the configuration option 'strict_field'. For instance:
+
+[% INCLUDE examples/object_strictfield_define | linenum %]
+ 
+would result in a message to STDERR, something like:
+
+[% INCLUDE examples/object_strictfield_errormsg | linenum %]
+
+since you have misspelled the property. Note that SPOPS will continue
+working and will not 'die' on such an error, just issue a warning.
+
+=head2 More Examples
+
+[% INCLUDE examples/object_example_allthemes | linenum %]
+
+[% INCLUDE examples/object_example_users | linenum %]
+
+[% INCLUDE examples/object_example_misc | linenum %]
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001-2004 Chris Winters. All rights reserved.
+
+See L<SPOPS::Manual|SPOPS::Manual> for license.
+
+=head1 AUTHORS
+
+Chris Winters E<lt>chris@cwinters.comE<gt>

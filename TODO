@@ -1,0 +1,36 @@
+SPOPS To Do
+========================================
+
+0.54
+
+ - creation security - variable group ID (SF ID: 468907)
+
+ - Export generated SPOPS class to file (SF ID: 468902)
+
+ - Create SPOPS::DBI::MultiDatasource
+
+0.55
+
+ - Create BerkeleyDB datastore (SF ID: 468903)
+
+0.60
+
+ - Improved relationship (has_a/links_to) (SF ID: 469367)
+
+ - SPOPS::Inheritable (SF ID: 469368)
+
+ - Implement caching (SF ID: 469360)
+
+ - When implementing ESPOPS, create 'field()' method in
+ SPOPS::Inheritable that gathers the list of fields in the object plus
+ all its parents (plus all its parents, etc.) or at least returns a
+ list of such fields that is stored in the class.
+
+ - When redoing SPOPS::Tie, allow people to use 'tie_temp_prefix' in
+ object configuration to specify the prefix to use. This also entails
+ gathering all the 'tie_' fields when the class is first created and
+ making a method that simply returns a hashref of parameters to use
+ when calling SPOPS::Tie or any of its children.
+
+========================================
+$Id: TODO,v 3.0 2002/08/28 01:16:29 lachoy Exp $

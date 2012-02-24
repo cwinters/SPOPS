@@ -1,0 +1,14 @@
+CREATE TABLE address (
+  address_id   INT NOT NULL AUTO_INCREMENT,
+  company      varchar(50) null,
+  address1     varchar(100) null,
+  address2     varchar(100) null,
+  city         varchar(40) null,
+  state        char(2) null,
+  postal       varchar(12) null
+  email        varchar(75) null,
+  main_phone   varchar(25) not null,
+  main_fax     varchar(25) null,
+  mobile_phone varchar(25) null,
+  primary key ( address_id )
+)

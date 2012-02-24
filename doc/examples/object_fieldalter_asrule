@@ -1,0 +1,14 @@
+sub ruleset_add {
+    my ( $class, $rs_table ) = @_;
+    push @{ $rs_table->{post_fetch_action} }, \&manipulate_date;
+    return ref $class || $class;
+}
+
+sub manipulate_date {
+    my ( $self, $p ) = @_;
+    return 1 unless ( $self->{start_date} );
+    my $start_date_object = Class::Date->new( $self->{start_date} );
+    local $Class::Date::DATE_FORMAT = '%Y/%m/%d %I:%M %p';
+    $self->{start_date} = "$start_date_object";
+}
+

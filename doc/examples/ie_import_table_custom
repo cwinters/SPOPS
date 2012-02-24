@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use strict;
+use SPOPS::Import;
+
+my %DATATYPES = initialize_datatypes();
+
+{
+    my $table_import = SPOPS::Import->new( 'table' );
+    $table_import->database_type( 'mysql' );
+    $table_import->print_only( 1 );
+    $table_import->transforms([ \&my_transform ]);
+    $table_import->read_table_from_file( 'ie_import_table_custom_before' );
+    $table_import->run;
+}
+
+sub my_transform {
+    my ( $self, $sql, $importer ) = @_;
+    foreach my $datatype ( keys %DATATYPES ) {
+        $$sql =~ s/%%$datatype%%/$DATATYPES{ $datatype }/g;
+    }
+}
+
+
+sub initialize_datatypes {
+    my %h = ();
+    open( DT, "ie_import_table_datatypes" )
+        || die "Cannot import datatypes: $!";
+    while ( <DT> ) {
+        chomp;
+        s/^\s+//;
+        s/\s+$//;
+        my ( $datatype, $sql ) = split /\s+/, $_, 2;
+        $h{ uc $datatype } = $sql;
+    }
+    return %h;
+}

@@ -1,0 +1,16 @@
+ # Note that 'login_name' is not required as a parameter; this is just
+ # an example
+
+ my $user_members = eval { $group->user };
+ foreach my $user ( @{ $user_members } ) {
+     print "Username is $user->{login_name}\n";
+ }
+
+ # Note that 'name' is not required as a parameter; this is just an
+ # example
+
+ my $groups = eval { $user->group };
+ foreach my $group ( @{ $groups } ) {
+     print "Group name is $group->{name}\n";
+ }
+

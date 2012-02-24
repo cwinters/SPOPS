@@ -1,0 +1,19 @@
+package MyApp::Datasource; # -*-perl-*-
+
+use strict;
+use DBI;
+
+my ( $DBH );
+
+sub global_datasource_handle {
+    my ( $class ) = @_;
+    return $DBH if ( $DBH );
+    $DBH = DBI->connect( 'DBI:Pg:dbname=mydb', 'postgres', 'postgres',
+                         { RaiseError => 1, PrintError = 0 } );
+    unless ( $DBH ) {
+        die "Cannot create database handle! Error: $DBI::errstr\n";
+    }
+    return $DBH;
+}
+
+1;

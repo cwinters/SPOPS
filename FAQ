@@ -1,0 +1,42 @@
+SPOPS FAQ
+========================================
+
+QQQQQQQQQQ
+
+I'm trying to use multiple property values but when I try to do
+something like:
+
+  print join( ', ', @{ $object->{myproperty} } ), "\n";
+
+I get an error like:
+
+  Can't use string ("top") as an ARRAY ref while "strict refs" in use
+  at ...
+
+AAAAAAAAAA
+
+You need to tell SPOPS that the property supports multiple values. In
+your configuration, define:
+
+    multivalue => [ 'myproperty' ],
+
+and you should be set.
+
+
+QQQQQQQQQQ
+
+When running the DBI SPOPS tests with Postgres, I get:
+
+  NOTICE: CREATE TABLE/PRIMARY KEY will create implicit index
+  'spops_test_pkey' for table 'spops_test'
+
+Can I turn this off?
+
+AAAAAAAAAA
+
+This is a 'feature' of the Postgres client library that is passed
+along by DBD::Pg. Nothing we can do.
+
+
+========================================
+$Id: FAQ,v 3.0 2002/08/28 01:16:29 lachoy Exp $

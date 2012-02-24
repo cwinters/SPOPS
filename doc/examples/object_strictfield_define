@@ -1,0 +1,13 @@
+$spops = {
+      user => {
+          class        => 'My::User',
+          isa          => [ qw/ SPOPS::DBI::Pg SPOPS::DBI / ],
+          field        => [ qw/ first_name last_name login / ],
+          strict_field => 1,
+          ...
+     },
+};
+...
+my $user = My::User->new;
+$user->{firstname} = 'Chucky';
+

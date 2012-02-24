@@ -1,0 +1,5 @@
+ use Log::Log4perl;
+ 
+ # 'log4perl.conf' is the name of your configuration file
+ 
+ Log::Log4perl::init( 'log4perl.conf' );

@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use strict;
+use DBI;
+use SPOPS::Initialize;
+
+my ( $DBH );
+
+{
+    my $spops = {
+      'news' => {
+         class           => 'My::News',
+         isa             => [ 'SPOPS::DBI::Pg', 'SPOPS::DBI' ],
+         rules_from      => [ 'My::DiscoverField' ],
+         code_class      => [ 'My::NewsHandle' ],
+         field_discover  => 'yes',
+         base_table      => 'news',
+         id_field        => 'news_id',
+         increment_field => 1,
+         no_insert       => [ 'news_id' ],
+         no_update       => [ 'news_id' ],
+      },
+    };
+
+    SPOPS::Initialize->process({ config => $spops });
+}
+
+sub My::News::global_datasource_handle {
+    my ( $class ) = @_;
+    return $DBH if ( $DBH );
+    $DBH = DBI->connect( 'DBI:Pg:dbname=mydb', 'postgres', 'postgres',
+                         { RaiseError => 1, PrintError = 0 } );
+    unless ( $DBH ) {
+        die "Cannot create database handle! Error: $DBI::errstr\n";
+    }
+    return $DBH;
+}

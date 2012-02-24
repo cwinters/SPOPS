@@ -1,0 +1,6 @@
+'book' => {
+   class           => 'My::Book',
+   isa             => [ 'SPOPS::LDAP' ],
+   multivalue      => [ 'publisherLink' ],
+   has_a           => { 'My::Publisher' => 'publisherLink' },
+}

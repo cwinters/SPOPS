@@ -1,0 +1,20 @@
+BUILDING SPOPS FROM CVS
+========================================
+
+This document contains instructions for building SPOPS from CVS
+sources.
+
+The only thing to worry about is the SPOPS manual, which is run
+through the Template Toolkit before being put into the right place. If
+you do not run the 'build_docs' script you'll get a bunch of messages
+from 'perl Makefile.PL' that 'SPOPS/Manual...' files are missing.
+
+To build these first, first make sure you have the Template Toolkit
+installed, then run './build_docs' from the root of the SPOPS source.
+
+ $ ./build_docs
+
+That's it!
+
+========================================
+$Id: BUILDING_FROM_CVS,v 3.0 2002/08/28 01:16:28 lachoy Exp $

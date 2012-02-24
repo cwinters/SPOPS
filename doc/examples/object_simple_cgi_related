@@ -1,0 +1,2 @@
+my $user_group = $obj->group;
+print "Group Name: $user_group->{name}\n";

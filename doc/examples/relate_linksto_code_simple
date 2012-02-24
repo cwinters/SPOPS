@@ -1,0 +1,6 @@
+my $publisher = My::Publisher->fetch( $pub_id );
+my $books = $publisher->book;
+print "Books published by $publisher->{name}:\n";
+foreach my $book ( @{ $books } ) {
+   print "  $book->{name}\n";
+}

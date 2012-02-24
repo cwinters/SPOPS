@@ -1,0 +1,11 @@
+# Retrieve all themes and print a description
+
+my $themes = eval { $theme_class->fetch_group( { order => 'title' } ) };
+if ( $@ ) { ... report error ... }
+else {
+    foreach my $thm ( @{ $themes } ) {
+        print "Theme: $thm->{title}\n",
+              "Description: $thm->{description}\n";
+    }
+}
+

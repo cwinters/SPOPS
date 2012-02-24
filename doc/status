@@ -1,0 +1,61 @@
+SPOPS::Manual
+
+ - Pretty much done. If we add further sections to the manual we'll
+ have to put a pointer here, but other than that...
+
+SPOPS::Manual::Intro
+
+ - More overview -- maybe as an example walk through a single request
+ in pseudocode?
+
+ - Put the ASCII-art in better context, although it's mostly there.
+
+SPOPS::Manual::Object
+
+ - More examples. Otherwise I think the basics are there.
+
+SPOPS::Manual::Configuration
+
+ - More examples
+
+ - Put examples into external files
+
+SPOPS::Manual::CodeGeneration
+
+ - More examples (use DiscoverFields, talk about metadata discovery)
+
+ - Discuss strategy
+
+SPOPS::Manual::Serialization
+
+ - Lazy loading example
+
+ - Failed action example
+
+ - Storable example
+
+ - Discuss save(), fetch(), remove()
+
+SPOPS::Manual::ObjectRules
+
+ - More examples -- ALL kinds of stuff
+
+ - Put existing example in external file
+
+SPOPS::Manual::Datasource
+
+ - General discussion (what is a datasource); how SPOPS views
+ datasources; how to create a connection manager (swipe from
+ cookbook?)
+
+SPOPS::Manual::Security
+
+ - Add examples -- use My::Security and other stuff
+
+SPOPS::Manual::Error
+
+ - More examples
+
+SPOPS::Manual::Cookbook
+
+ - Solicit for recipes?

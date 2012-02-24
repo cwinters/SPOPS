@@ -1,0 +1,9 @@
+my $publisher = My::Publisher->fetch( "O'Reilly and Associates" );
+foreach my $book ( @{ $publisher->book } ) {
+    if ( $book->{subject} eq 'Perl' ) {
+        $book->{sales} *= 10;
+    }
+    if ( $book->{subject} eq '.NET' ) {
+        $publisher->book_remove( $book );
+    }
+}

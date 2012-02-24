@@ -1,0 +1,32 @@
+package My::NewsProcs; # -*-perl-*-
+
+use strict;
+
+# All active news stories by a particular user, sorted in reverse
+# date (latest first) order
+
+sub by_user {
+    my ( $class, $user, $params ) = @_;
+    unless ( $user->id ) {
+        SPOPS::Error->set({
+           error_msg => 'Cannot fetch news messages with unsaved user!',
+           type      => 'news' });
+        die $SPOPS::Error::error_msg;
+    }
+
+    my $iter = eval { $class->fetch_iterator({
+                                   where => "active = ? AND posted_by = ?",
+                                   value => [ 'yes', $user->id ],
+                                   order => 'posted_on DESC',
+                                   limit => $params->{limit} });
+    if ( $@ ) {
+        SPOPS::Error->set({ 
+           error_msg  => 'Cannot run query to retrieve news messages by user',
+           system_msg => $SPOPS::Error::system_msg,
+           type       => 'news' });
+        die $SPOPS::Error::error_msg;
+    }
+    return $iter;    
+}
+
+1;

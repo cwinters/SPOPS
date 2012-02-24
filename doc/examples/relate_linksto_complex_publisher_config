@@ -1,0 +1,5 @@
+   links_to        => { 'My::Book' =>
+                          { table         => 'publisher_book',
+                            to_id_field   => 'b_id',
+                            from_id_field => 'p_id', },
+                      }

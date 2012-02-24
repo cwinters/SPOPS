@@ -1,0 +1,13 @@
+'book' => {
+   class           => 'My::Book',
+   isa             => [ 'SPOPS::DBI::Pg', 'SPOPS::DBI' ],
+   id              => 'book_id',
+   field_discover  => 'yes',
+   base_table      => 'book',
+   increment_field => 1,
+   no_insert       => [ 'book_id' ],
+   no_update       => [ 'book_id' ],
+   has_a           => { 'My::Publisher' => [ 'original_publisher_id',
+                                             'current_publisher_id' ],
+                        'My::User'      => { updater => 'updated_by' } },
+}

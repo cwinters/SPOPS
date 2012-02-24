@@ -1,0 +1,12 @@
+package MyApplication::Exception
+
+use strict;
+use base qw( SPOPS::Exception );
+
+my @FIELDS = qw( epoch_time business_action );
+MyApplication::Exception->mk_accessors( @FIELDS );
+sub get_fields { return ( $_[0]->SUPER::get_fields, @FIELDS ) }
+
+sub initialize { $_[0]->epoch_time( time ) }
+
+1;

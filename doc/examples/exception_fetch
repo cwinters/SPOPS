@@ -1,0 +1,15 @@
+my $news_id = $q->param( 'news_id' );
+my $news = eval { My::News->fetch( $news_id ) };
+if ( $@ ) {
+    log_error( $@ );
+    if ( $@->isa( 'SPOPS::Exception::Security' ) ) {
+        print "Cannot retrieve News article -- insufficient security access.";
+    }
+    else {
+        print "Cannot retrieve News article! (Error: $@) Please ",
+              "contact administrator.";
+    }
+}
+else {
+    print "$news->{title}\n$news->{posted_on}\n$news->{content}\n";
+}

@@ -1,0 +1,7 @@
+my $q = new CGI;
+my $object_id = $q->param( 'object_id' );
+my $obj = MyUserClass->fetch( $object_id );
+print "First Name: $obj->{f_name}\n",
+      "Last Name:  $obj->{l_name}\n",
+      "Birthday:   $obj->{birthdate}\n";
+
